@@ -11,5 +11,6 @@ define('CONTROLLERS', ROOT.'/app/controllers/');
 define('MODELS', ROOT.'/app/models/');
 define('VIEWS', ROOT.'/app/views/');
 
-
-
+define('API_ROUTES', ROOT.'/app/routes/api.php');
+define('WEB_ROUTES', ROOT.'/app/routes/web.php');
+define('MIXIPHP_AGENT', 'MixiPHP/v1.0 API Access');

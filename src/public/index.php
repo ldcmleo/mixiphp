@@ -7,12 +7,6 @@
  * MixiPHP app with static class Router
  */
 include_once "../app/loader.php";
-$url = isset($_GET["url"]) ? $_GET["url"] : "/";
-$request = new Request($url, $_SERVER["REQUEST_METHOD"]);
-
-Router::setRequest($request);
-
-// TODO: read user-agent to determine if is web or api
-include_once "../app/routes/web.php";
-
+Router::setRequest(new Request((isset($_GET["url"]) ? $_GET["url"] : "/"), $_SERVER["REQUEST_METHOD"]));
+Router::setRoutes($_SERVER["HTTP_USER_AGENT"]);
 Router::execute();

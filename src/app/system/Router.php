@@ -11,6 +11,14 @@ class Router {
         Router::$request = $request;
     }
 
+    public static function setRoutes(String $userAgent) {
+        if($userAgent == MIXIPHP_AGENT) {
+            return include_once API_ROUTES;
+        }
+        
+        return include_once WEB_ROUTES;
+    }
+
     public static function get($url, $response) {
         Router::$routes[] = new Response($url, "GET", $response);
     }
