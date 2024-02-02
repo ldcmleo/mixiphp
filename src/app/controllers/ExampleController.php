@@ -13,6 +13,8 @@ class ExampleController {
      * but for semantic reason its highly recommended
      */
     public function index() {
+        $user = Model::use("user");
+
         return View::use("welcome");
     }
 
@@ -30,7 +32,7 @@ class ExampleController {
     /**
      * varFromPost
      * 
-     * For post variables can be obtained with magic variable $_POST
+     * Post variables can be obtained with magic variable $_POST
      */
     public function varFromPost() {
         echo $_POST["myvar"];
