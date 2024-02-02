@@ -3,14 +3,16 @@
  * 
  * 
  */
-class Models extends Database {
+class Model extends Database {
+    private Query $query = NULL;
+
     public function __construct() {
         parent::__construct();
     }
 
     public static function use($model) {
         if(!$model) {
-            throw new Exception("Model::use expected 1 argument but it doesn't passed");
+            throw new Exception("Model::use expected 1 argument but it doesn't exist");
         }
 
         $model = ucfirst($model);
@@ -20,5 +22,10 @@ class Models extends Database {
 
         require_once MODELS.$model.".php";
         return new $model();
+    }
+
+    public function select(array $columns) {
+
+        return $this;
     }
 }

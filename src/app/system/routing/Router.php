@@ -12,7 +12,7 @@ class Router {
     }
 
     public static function setRoutes(String $userAgent) {
-        if($userAgent == MIXIPHP_AGENT) {
+        if($userAgent == MIXIPHP_API_AGENT) {
             return include_once API_ROUTES;
         }
         
