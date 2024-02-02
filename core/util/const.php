@@ -7,10 +7,9 @@
  */
 
 // * Constants for basic directories
-define('ROOT', (dirname(dirname(dirname(__FILE__)))) . "/");
-define('CONTROLLERS', ROOT.'controllers/');
-define('MODELS', ROOT.'models/');
-define('VIEWS', ROOT.'views/');
+define('CONTROLLERS', ROOT.'app/controllers/');
+define('MODELS', ROOT.'app/models/');
+define('VIEWS', ROOT.'app/views/');
 
 // * Constants for specifically files
 define('API_ROUTES', ROOT.'routes/api.php');

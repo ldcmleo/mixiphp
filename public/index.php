@@ -6,7 +6,7 @@
  * Load all modules and create a request to process with
  * MixiPHP app with static class Router
  */
-include_once "../app/loader.php";
+include_once "../mixi/core/run.php";
 Router::setRequest(new Request((isset($_GET["url"]) ? $_GET["url"] : "/"), $_SERVER["REQUEST_METHOD"]));
 Router::setRoutes($_SERVER["HTTP_USER_AGENT"]);
 Router::execute();

@@ -4,7 +4,6 @@
  * 
  */
 class Model extends Database {
-    private Query $query = NULL;
 
     public function __construct() {
         parent::__construct();
