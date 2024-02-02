@@ -9,9 +9,10 @@
  * * if you're using docker with compose configuration all database
  * * configuration is founded in:
  * * resources/compose.yml
+ * ! By default DB_HOST is defined as a docker-compose file
  */
 
-define('DB_HOST', 'localhost');
+define('DB_HOST', 'db');
 define('DB_USER', 'mixiphp');
 define('DB_PASS', 'example123');
 define('DB_NAME', 'appdb');

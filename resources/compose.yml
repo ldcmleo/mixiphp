@@ -29,9 +29,10 @@ services:
     networks:
       - default
   phpmyadmin:
+    container_name: phpmyadmin
     image: phpmyadmin/phpmyadmin
     links: 
-       - db:db
+       - db
     ports:
       - 8000:80
     environment:
