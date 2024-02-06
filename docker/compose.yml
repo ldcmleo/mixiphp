@@ -22,11 +22,11 @@ services:
     links:
       - db
     volumes:
-      - "C:/Users/leonardo/Public/mixiphp/public:/var/www/html"
-      - "C:/Users/leonardo/Public/mixiphp/core:/var/www/mixi/core"
-      - "C:/Users/leonardo/Public/mixiphp/app:/var/www/mixi/app"
-      - "C:/Users/leonardo/Public/mixiphp/config:/var/www/mixi/config"
-      - "C:/Users/leonardo/Public/mixiphp/routes:/var/www/mixi/routes"
+      - "/home/ldcmleo/Desarrollo/mixiphp/public:/var/www/html"
+      - "/home/ldcmleo/Desarrollo/mixiphp/core:/var/www/mixi/core"
+      - "/home/ldcmleo/Desarrollo/mixiphp/app:/var/www/mixi/app"
+      - "/home/ldcmleo/Desarrollo/mixiphp/config:/var/www/mixi/config"
+      - "/home/ldcmleo/Desarrollo/mixiphp/routes:/var/www/mixi/routes"
     ports:
       - "80:80"
     networks:
