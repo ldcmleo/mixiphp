@@ -9,14 +9,24 @@
 class Query {
     private $type;
     private $parameters;
+    private $tableName;
 
-    public function __construct(QueryType $type) {
+    public function __construct(QueryType $type, $tableName) {
         $this->type = $type;
-
-        $this->getTypeParameters();
+        $this->tableName = $tableName;
+        $this->parameters = $this->getTypeParameters();
     }
 
+    /**
+     * 
+     * Implements a special keys for every query type
+     * 
+     * @return Array array with all index for different query type
+     */
     private function getTypeParameters() {
-        
+        $params = array();
+        if ($this->type == QueryType::Select) {
+            $params["selected_rows"] = array();
+        }
     }
 }
