@@ -23,7 +23,8 @@ class Model extends Database {
         return new $model();
     }
 
-    public function select(array $columns) {
+    public function select(array $columns = NULL) {
+        
 
         return $this;
     }

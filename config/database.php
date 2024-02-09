@@ -9,7 +9,7 @@
  * * if you're using docker with compose configuration all database
  * * configuration is founded in:
  * * resources/compose.yml
- * ! By default DB_HOST is defined as a docker-compose file
+ * ! By default DB_HOST is defined with the docker-compose file configuration
  */
 
 define('DB_HOST', 'db');
