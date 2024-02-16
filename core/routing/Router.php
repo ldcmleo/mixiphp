@@ -35,7 +35,7 @@ class Router {
 
             call_user_func_array($responseFunction, $data);
         } catch (Exception $error) {
-            return View::use("404", ["error" => $error->getMessage()]);
+            return View::use("500", ["error" => $error->getMessage()]);
         }
     }
 

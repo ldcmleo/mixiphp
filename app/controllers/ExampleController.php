@@ -13,8 +13,6 @@ class ExampleController {
      * but for semantic reason its highly recommended
      */
     public function index() {
-        $user = Model::use("user");
-
         return View::use("welcome");
     }
 

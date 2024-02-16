@@ -6,6 +6,7 @@
 
 define('ROOT', dirname(dirname(__FILE__)) . "/");
 // config folder
+include_once ROOT."config/basic.php";
 include_once ROOT."config/database.php";
 
 // core folder
