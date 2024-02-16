@@ -1,4 +1,6 @@
 <?php
+namespace core\routing;
+use core\util\ArgumentType;
 /**
  * Class Argument
  * By: Leonardo Castro
@@ -13,7 +15,7 @@ class Argument {
     
     public function __construct(String $key, $type = ArgumentType::Static) {
         if(!$key) {
-            throw new Exception("Class Argument expected at least 2 parameters but it received 1", 1);
+            throw new \Exception("Class Argument expected at least 2 parameters but it received 1", 1);
         }
 
         $this->type = $type;

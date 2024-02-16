@@ -1,4 +1,5 @@
 <?php
+namespace core\routing;
 /**
  * 
  * Class Request
@@ -12,7 +13,7 @@ class Request {
     private $method;
 
     public function __construct(String $url, String $method = "GET") {
-        if (!$url) throw new Exception("Request added without url, verify your routes");
+        if (!$url) throw new \Exception("Request added without url, verify your routes");
         $this->method = $method;
         $this->url = new Url($url);
     }

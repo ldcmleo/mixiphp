@@ -1,4 +1,6 @@
 <?php
+use core\routing\Router;
+use core\routing\Request;
 /**
  * Front Controller on public folder
  * 

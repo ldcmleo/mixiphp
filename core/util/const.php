@@ -1,4 +1,5 @@
 <?php
+namespace core\util;
 /**
  * 
  * Basic configuration from MixiPHP

@@ -1,4 +1,7 @@
 <?php
+use core\routing\Router;
+use core\app\View;
+
 /**
  * 
  * All routes accessible from the web.

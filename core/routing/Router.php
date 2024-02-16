@@ -1,4 +1,6 @@
 <?php
+namespace core\routing;
+use core\app\View;
 /**
  * 
  * 
@@ -34,7 +36,7 @@ class Router {
             $data = $response->getUrl()->getDynamicData(Router::$request->getUrl());
 
             call_user_func_array($responseFunction, $data);
-        } catch (Exception $error) {
+        } catch (\Exception $error) {
             return View::use("500", ["error" => $error->getMessage()]);
         }
     }
@@ -46,6 +48,6 @@ class Router {
             }
         }
 
-        throw new Exception("Page not Found");
+        throw new \Exception("Page not Found");
     }
 }

@@ -1,4 +1,5 @@
 <?php
+namespace core\db;
 /**
  * 
  * Class Database
@@ -22,14 +23,14 @@ class Database {
         $dsn = "mysql:host=$this->host;dbname=$this->db";
 
         $opciones = array(
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
         );
 
         try {
-            $this->dbh = new PDO($dsn, $this->user, $this->pass, $opciones);
+            $this->dbh = new \PDO($dsn, $this->user, $this->pass, $opciones);
             $this->dbh->exec("set names utf8");
-        } catch (PDOException $e) {
-            throw new Exception("Error at Database connection level <br> Description: " . $e->getMessage());
+        } catch (\PDOException $e) {
+            throw new \Exception("Error at Database connection level <br> Description: " . $e->getMessage());
         }
     }
 
@@ -42,8 +43,8 @@ class Database {
     public function query($sql) {
         try {
             $this->stmt = $this->dbh->prepare($sql); 
-        } catch (Exception $e) {
-            throw new Exception("Error at Database level <br> Description" . $e->getMessage());
+        } catch (\Exception $e) {
+            throw new \Exception("Error at Database level <br> Description" . $e->getMessage());
         }
     }
 
@@ -58,24 +59,24 @@ class Database {
         if (is_null($type)) {
             switch(true) {
                 case is_int($value):
-                    $type = PDO::PARAM_INT;
+                    $type = \PDO::PARAM_INT;
                     break;
                 case is_bool($value):
-                    $type = PDO::PARAM_BOOL;
+                    $type = \PDO::PARAM_BOOL;
                     break;
                 case is_null($value):
-                    $type = PDO::PARAM_NULL;
+                    $type = \PDO::PARAM_NULL;
                     break;
                 default:
-                    $type = PDO::PARAM_STR;
+                    $type = \PDO::PARAM_STR;
                     break;
             }
         }
         
         try {
             $this->stmt->bindValue($param, $value, $type);
-        } catch (Exception $e) {
-            throw new Exception("Error at Database level <br> Description" . $e->getMessage());
+        } catch (\Exception $e) {
+            throw new \Exception("Error at Database level <br> Description: " . $e->getMessage());
         }
     }
 
@@ -85,7 +86,13 @@ class Database {
      * execute the PDO_STATEMENT::execute() function to get DB result of query
      * @return boolean return true on success or false on failure
      */
-    public function exec() { return $this->stmt->execute(); }
+    public function exec() {
+        try {
+            return $this->stmt->execute(); 
+        } catch (\PDOException $e) {
+            throw new \Exception("Error at Database level <br> Description: " . $e->getMessage());
+        }
+    }
 
     /**
      * 
@@ -96,7 +103,7 @@ class Database {
      */
     public function getRows() {
         $this->exec();
-        return $this->stmt->fetchAll(PDO::FETCH_OBJ);
+        return $this->stmt->fetchAll(\PDO::FETCH_OBJ);
     }
 
     /**
@@ -108,15 +115,6 @@ class Database {
      */
     public function getRow() {
         $this->exec();
-        return $this->stmt->fetch(PDO::FETCH_OBJ);
+        return $this->stmt->fetch(\PDO::FETCH_OBJ);
     }
-
-    /**
-     * 
-     * getRowCount
-     * get number of rows in the statement
-     * 
-     * @return integer count of rows in the statement query
-     */
-    public function getRowCount() { return $this->stmt->rowCount(); }
 }

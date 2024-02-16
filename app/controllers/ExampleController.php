@@ -4,6 +4,9 @@
  * 
  * This is an example to use as standard with MixiPHP
  */
+use app\models\User;
+use core\app\View;
+
 class ExampleController {
     
     /**
