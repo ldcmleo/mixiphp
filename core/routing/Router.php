@@ -2,8 +2,12 @@
 namespace core\routing;
 use core\app\View;
 /**
+ * Class Router
+ * By Leonardo Castro
  * 
- * 
+ * Router manage all request and routes for system
+ * also u can use get and post method functions to difference between these
+ * two http methods
  */
 class Router {
     private static $request;

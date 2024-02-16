@@ -1,12 +1,13 @@
 <?php
+// use class to be implemented in this controller
+use app\models\User;
+use core\app\View;
+
 /**
  * Class ExampleController
  * 
  * This is an example to use as standard with MixiPHP
  */
-use app\models\User;
-use core\app\View;
-
 class ExampleController {
     
     /**

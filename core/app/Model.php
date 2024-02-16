@@ -1,9 +1,12 @@
 <?php
 namespace core\app;
 use core\db\Database;
+
 /**
+ * class Model
  * 
- * 
+ * parent class for all models, with default functions to manage
+ * all models with the database.
  */
 class Model {
     private $tableName;
@@ -14,6 +17,15 @@ class Model {
         if($attributes) $this->attributes = $attributes;
     }
 
+    /**
+     * use
+     * 
+     * retrieve a model child class with @model as name (name of file too)
+     * u can also use traditional instance method e.j. $user = new User();
+     * 
+     * @param string $model name of file and class to be used
+     * @return object instance of model class
+     */
     public static function use($model) {
         if(!$model) {
             throw new \Exception("Model::use expected 1 argument but it doesn't exist");
@@ -65,11 +77,19 @@ class Model {
     public function build() { }
 
     /**
-     * Getters and Setters
-     */
-
-    /**
      * setTableName
+     * configure tablename with the model child name
+     * 
+     * model name has pascal case and has the same name of file
+     * e.j. CityHouse => CityHouse.php
+     * 
+     * for single model name e.j. "User" table name can be "user",
+     * when the model name has more than one word, system explode it
+     * and mix again with snake case e.j. CityHouse => city_house.
+     * 
+     * table in BD need name like snake case e.j. city_house
+     * 
+     * @return string name of database to match with this model
      */
     public function setTableName() {
         $modelName = (new \ReflectionClass($this))->getShortName();

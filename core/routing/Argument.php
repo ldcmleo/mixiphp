@@ -1,6 +1,7 @@
 <?php
 namespace core\routing;
 use core\util\ArgumentType;
+
 /**
  * Class Argument
  * By: Leonardo Castro

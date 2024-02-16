@@ -1,9 +1,13 @@
 <?php
 namespace core\routing;
 use core\app\Controller;
+
 /**
+ * Class Response
+ * By: Leonardo Castro
  * 
- * 
+ * Response as Request class use a Url class and handle
+ * the response to certain url expecting a callable caller $this->function
  */
 class Response {
     private $url;
@@ -20,6 +24,11 @@ class Response {
         $this->function = $function;
     }
 
+    /**
+     * use
+     * 
+     * retrieve a callable or class controller function
+     */
     public function use() {
         if(is_null($this->function)) {
             throw new \Exception("Response has not function declared");
