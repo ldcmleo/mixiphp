@@ -73,8 +73,73 @@ class Model {
         return $db->exec();
     }
 
+    /**
+     * remove
+     * 
+     * delete this model from the database
+     * 
+     * @param string $whereColumn column where clause from delete statement
+     * @return boolean true on success, false on fail
+     */
+    public function remove($whereColumn = NULL) {
+        if(!$this->attributes) {
+            throw new \Exception("Error, this model has no attributes");
+        }
+
+        if($whereColumn) {
+            if(!key_exists(strtolower(func_get_arg(0)), $this->attributes)) {
+                throw new \Exception("Error, The parameter does not belong to the attributes of the model");
+            }
+
+            $column = strtolower(func_get_arg(0));
+            $value  = $this->attributes[$column];
+
+            $sql = "DELETE FROM `$this->tableName` WHERE $column = :$column";
+            
+            $db = new Database;
+            $db->query($sql);
+            $db->bind(":$column", $value);
+
+            return $db->exec();
+        }
+
+        $conditions = "";
+        foreach($this->attributes as $column => $value) {
+            $conditions .= " $column = :$column AND";
+        }
+        $conditions = substr($conditions, 0, -3);
+
+        $sql = "DELETE FROM `$this->tableName` WHERE $conditions";
+        $db = new Database;
+        $db->query($sql);
+        foreach($this->attributes as $column => $value) {
+            $db->bind(":$column", $value);
+        }
+
+        return $db->exec();
+    }
+
     public function get() { }
     public function build() { }
+
+    public function setAttributes(array $attributes) {
+        foreach($attributes as $column => $value) {
+            $this->setAttribute($column, $value);
+        }
+    }
+    
+    public function getAttributes() {
+        return $this->attributes;
+    }
+
+    public function setAttribute($attribute, $value) {
+        $this->attributes[$attribute] = $value;
+    }
+
+    public function getAttribute($attribute) {
+        if(!key_exists($attribute, $this->attributes)) return;
+        return $this->attributes[$attribute];
+    }
 
     /**
      * setTableName
