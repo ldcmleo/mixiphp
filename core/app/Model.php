@@ -14,7 +14,7 @@ class Model {
     
     public function __construct($attributes = NULL) {
         $this->tableName = $this->setTableName();
-        if($attributes) $this->attributes = $attributes;
+        if($attributes) $this->setAttributes($attributes);
     }
 
     /**
@@ -47,26 +47,27 @@ class Model {
      * @return boolean true on success, false on fail
      */
     public function save() {
-        if(!$this->attributes) {
+        if(!$this->getAttributes()) {
             throw new \Exception("Model " . get_class($this) . " need attributes to insert into table: " . $this->getTableName());
         }
         
         $columns = "";
         $values = "";
 
-        foreach($this->attributes as $column => $value) {
+        foreach($this->getAttributes() as $column => $value) {
             $columns .= "$column, ";
             $values .= ":$column, ";
         }
         
         $columns = substr($columns, 0, -2);
         $values = substr($values, 0, -2);
-        
-        $sql = "INSERT INTO `$this->tableName` ($columns) VALUES ($values)";
+        $tableName = $this->getTableName();
+
+        $sql = "INSERT INTO `$tableName` ($columns) VALUES ($values)";
 
         $db = new Database;
         $db->query($sql);
-        foreach($this->attributes as $column => $value) {
+        foreach($this->getAttributes() as $column => $value) {
             $db->bind(":$column", $value);
         }
 
@@ -82,45 +83,106 @@ class Model {
      * @return boolean true on success, false on fail
      */
     public function remove($whereColumn = NULL) {
-        if(!$this->attributes) {
+        if(!$this->getAttributes()) {
             throw new \Exception("Error, this model has no attributes");
         }
 
         if($whereColumn) {
-            if(!key_exists(strtolower(func_get_arg(0)), $this->attributes)) {
+            if(!$this->attrExists($whereColumn)) {
                 throw new \Exception("Error, The parameter does not belong to the attributes of the model");
             }
 
-            $column = strtolower(func_get_arg(0));
-            $value  = $this->attributes[$column];
-
-            $sql = "DELETE FROM `$this->tableName` WHERE $column = :$column";
+            $column = strtolower($whereColumn);
+            $tableName = $this->getTableName();
+            $sql = "DELETE FROM `$tableName` WHERE $column = :$column";
             
             $db = new Database;
             $db->query($sql);
-            $db->bind(":$column", $value);
+            $db->bind(":$column", $this->getAttribute($column));
 
             return $db->exec();
         }
 
-        $conditions = "";
-        foreach($this->attributes as $column => $value) {
-            $conditions .= " $column = :$column AND";
+        $pk = $this->getPrimaryKey();
+        if(!$this->attrExists($pk)) {
+            throw new \Exception("Error, Model has no primary key attribute");
         }
-        $conditions = substr($conditions, 0, -3);
 
-        $sql = "DELETE FROM `$this->tableName` WHERE $conditions";
+        $tableName = $this->getTableName();
+        $sql = "DELETE FROM `$tableName` WHERE $pk = :$pk";
         $db = new Database;
         $db->query($sql);
-        foreach($this->attributes as $column => $value) {
+        $db->bind(":$pk", $this->getAttribute($pk));
+
+        return $db->exec();
+    }
+
+    /**
+     * update
+     * 
+     * update database row match with @whereColumn with model attributes
+     * 
+     */
+    public function update($whereColumn = NULL) {
+        if(!$this->getAttributes()) {
+            throw new \Exception("Model " . get_class($this) . " need attributes to insert into table: " . $this->getTableName());
+        }
+
+        if($whereColumn) {
+            if(!$this->attrExists($whereColumn)) {
+                throw new \Exception("Error, The parameter does not belong to the attributes of the model");
+            }
+
+            $whereColumn = strtolower($whereColumn);
+
+            $sets = "";
+            foreach($this->getAttributes() as $column => $value) {
+                $sets .= "$column = :$column, ";
+            }
+            $sets = substr($sets, 0, -2);
+
+            $tableName = $this->getTableName();
+            $sql = "UPDATE `$tableName` SET $sets WHERE $whereColumn = :w$whereColumn";
+            $db = new Database;
+            $db->query($sql);
+            foreach($this->getAttributes() as $column => $value) {
+                $db->bind(":$column", $value);
+            }
+            $db->bind(":w$whereColumn", $this->getAttribute($whereColumn));
+
+            return $db->exec();
+        }
+
+        $pk = $this->getPrimaryKey();
+        if(!$this->attrExists($pk)) {
+            throw new \Exception("Error, Model has no primary key attribute");
+        }
+
+        $sets = "";
+        foreach($this->getAttributes() as $column => $value) {
+            $sets .= "$column = :$column, ";
+        }
+        $sets = substr($sets, 0, -2);
+
+        $tableName = $this->getTableName();
+        $sql = "UPDATE `$tableName` SET $sets WHERE $pk = :w$pk";
+        $db = new Database;
+        $db->query($sql);
+        foreach($this->getAttributes() as $column => $value) {
             $db->bind(":$column", $value);
         }
+        $db->bind(":w$pk", $this->getAttribute($pk));
 
         return $db->exec();
     }
 
     public function get() { }
     public function build() { }
+
+    public function getPrimaryKey() {
+        $db = new Database;
+        return $db->getPrimaryKey($this->tableName);
+    }
 
     public function setAttributes(array $attributes) {
         foreach($attributes as $column => $value) {
@@ -141,6 +203,11 @@ class Model {
         return $this->attributes[$attribute];
     }
 
+    public function attrExists($attribute) {
+        if(!$this->getAttribute($attribute)) return false;
+        return true;
+    }
+
     /**
      * setTableName
      * configure tablename with the model child name
@@ -152,7 +219,7 @@ class Model {
      * when the model name has more than one word, system explode it
      * and mix again with snake case e.j. CityHouse => city_house.
      * 
-     * table in BD need name like snake case e.j. city_house
+     * table in BD need column named like model with snake case e.j. city_house
      * 
      * @return string name of database to match with this model
      */

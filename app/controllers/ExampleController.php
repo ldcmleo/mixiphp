@@ -39,4 +39,19 @@ class ExampleController {
     public function varFromPost() {
         echo $_POST["myvar"];
     }
+
+    public function modelExample() {
+        // $userData = [
+        //     "id" => 5,
+        //     "name" => "equis",
+        //     "pass" => "abc123",
+        //     "email" => "equis@mail.com"
+        // ];
+        // $newUser = new User($userData);
+
+        // $newUser->save();
+        // $newUser->setAttribute("pass", "cba321");
+        // $newUser->update();
+        // $newUser->remove();
+    }
 }
