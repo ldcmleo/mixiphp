@@ -17,7 +17,7 @@ class ExampleController {
      * but for semantic reason its highly recommended
      */
     public function index() {
-        return View::use("welcome");
+        return View::use("example");
     }
 
     /**
