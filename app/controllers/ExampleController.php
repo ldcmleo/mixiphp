@@ -17,7 +17,17 @@ class ExampleController {
      * but for semantic reason its highly recommended
      */
     public function index() {
-        return View::use("example");
+        // $user = new User;
+        // $user->find(1);
+        // print_r($user->getAttributes());
+        // $user->setAttribute("name", "andrea");
+        // $user->setAttribute("pass", "abc123");
+        // echo "<br>";
+        // print_r($user->getAttributes());
+        // echo "<br>";
+        // if($user->update()) echo "actualizao";
+        
+        // return View::use("example");
     }
 
     /**

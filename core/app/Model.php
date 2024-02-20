@@ -11,6 +11,7 @@ use core\db\Database;
 class Model {
     private $tableName;
     private $attributes;
+    private $selectQuery;
     
     public function __construct($attributes = NULL) {
         $this->tableName = $this->setTableName();
@@ -176,8 +177,75 @@ class Model {
         return $db->exec();
     }
 
+    /**
+     * find
+     * search for a specific row in database model -> tablename
+     * 
+     * @param mix $value identifier of the searched row
+     */
+    public function find($value) {
+        $tableName = $this->getTableName();
+        $pk = $this->getPrimaryKey();
+
+        $db = new Database;
+        $db->query("SELECT * FROM $tableName WHERE $pk = :$pk");
+        $db->bind(":$pk", $value);
+        $result = $db->getRow();
+
+        if(!$result) return NULL;
+        $this->setAttributes((array) $result);
+    }
+
+    /**
+     * select
+     * 
+     */
+    public function select($columns = NULL) {
+        if(!is_array($columns) && !is_string($columns)) return $this;
+        if(is_string($columns)) {
+            $columns = explode(" ", $columns);
+        }
+
+        $this->selectQuery["cols"] = $columns;
+    }
+
+    public function where($conditions) { }
+    public function orWhere($conditions) { }
+    public function order($columns) { }
+    public function and($conditions) { }
+    public function or($conditions) { }
+    public function not($conditions) { }
+    public function in($columnName, $values) { }
+    public function take($nrows) { }
+    public function like($wildcar) { }
+    public function min($columnName) { }
+    public function max($columnName) { }
+    public function count($columnName = NULL) { }
+    public function sum($columnName) { }
+    public function avg($columnName) { }
+    public function join($type, $otherTable, $column1, $column2) { }
+    public function innerJoin($type, $otherTable, $column1, $column2) {
+        return $this->join($type, $otherTable, $column1, $column2);
+     }
+    public function leftJoin($type, $otherTable, $column1, $column2) {
+        return $this->join($type, $otherTable, $column1, $column2);
+     }
+    public function rightJoin($type, $otherTable, $column1, $column2) {
+        return $this->join($type, $otherTable, $column1, $column2);
+     }
+    public function fullJoin($type, $otherTable, $column1, $column2) {
+        return $this->join($type, $otherTable, $column1, $column2);
+     }
+
+    /**
+     * get
+     * retrieve the select query with the database results
+     * 
+     */
     public function get() { }
-    public function build() { }
+
+    ## build select query to be executed
+    private function build() { }
 
     public function getPrimaryKey() {
         $db = new Database;
