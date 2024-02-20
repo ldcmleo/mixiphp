@@ -207,15 +207,47 @@ class Model {
         }
 
         $this->selectQuery["cols"] = $columns;
+        return $this;
     }
 
-    public function where($conditions) { }
-    public function orWhere($conditions) { }
-    public function order($columns) { }
-    public function and($conditions) { }
-    public function or($conditions) { }
-    public function not($conditions) { }
+    public function where($conditions) {
+        $this->selectQuery["where"] = [
+            "type" => "and",
+            "conditions" => $conditions
+        ];
+        return $this;
+    }
+
+    public function orWhere($conditions) {
+        $this->selectQuery["where"] = [
+            "type" => "or",
+            "conditions" => $conditions
+        ];
+        return $this;
+    }
+
+    public function order($columns) {
+        $this->selectQuery["order"] = $columns;
+        return $this;
+    }
+
+    public function and($conditions) {
+        $this->selectQuery["and"][] = $conditions;
+        return $this;
+    }
+
+    public function or($conditions) {
+        $this->selectQuery["or"][] = $conditions;
+        return $this;
+    }
+
+    public function not($conditions) {
+        $this->selectQuery["not"][] = $conditions;
+        return $this;
+    }
+
     public function in($columnName, $values) { }
+
     public function take($nrows) { }
     public function like($wildcar) { }
     public function min($columnName) { }
@@ -223,19 +255,24 @@ class Model {
     public function count($columnName = NULL) { }
     public function sum($columnName) { }
     public function avg($columnName) { }
+
     public function join($type, $otherTable, $column1, $column2) { }
+
     public function innerJoin($type, $otherTable, $column1, $column2) {
         return $this->join($type, $otherTable, $column1, $column2);
-     }
+    }
+
     public function leftJoin($type, $otherTable, $column1, $column2) {
         return $this->join($type, $otherTable, $column1, $column2);
-     }
+    }
+
     public function rightJoin($type, $otherTable, $column1, $column2) {
         return $this->join($type, $otherTable, $column1, $column2);
-     }
+    }
+
     public function fullJoin($type, $otherTable, $column1, $column2) {
         return $this->join($type, $otherTable, $column1, $column2);
-     }
+    }
 
     /**
      * get
@@ -243,6 +280,18 @@ class Model {
      * 
      */
     public function get() { }
+
+    public function executeQuery($sql, $args = NULL) {
+        $db = new Database;
+        $db->query($sql);
+        if($args) {
+            foreach ($args as $key => $arg) {
+                $db->bind($key, $arg);
+            }
+        }
+
+        return $db->getRows();
+    }
 
     ## build select query to be executed
     private function build() { }
