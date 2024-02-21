@@ -246,17 +246,60 @@ class Model {
         return $this;
     }
 
-    public function in($columnName, $values) { }
+    public function in($columnName, $values) { 
+        $this->selectQuery["in"] = ["column" => $columnName, "values", $values];
+        return $this;
+    }
 
-    public function take($nrows) { }
-    public function like($wildcar) { }
-    public function min($columnName) { }
-    public function max($columnName) { }
-    public function count($columnName = NULL) { }
-    public function sum($columnName) { }
-    public function avg($columnName) { }
+    public function take($nrows) { 
+        $this->selectQuery["limit"] = $nrows;
+        return $this;
+    }
 
-    public function join($type, $otherTable, $column1, $column2) { }
+    public function like($wildcar) { 
+        $this->selectQuery["like"] = $wildcar;
+        return $this;
+    }
+
+    public function orLike($wildcar) { 
+        $this->selectQuery["orLike"] = $wildcar;
+        return $this;
+    }
+
+    public function min($columnName) { 
+        $this->selectQuery["function"] = ["type" => "min", "column" => $columnName];
+        return $this;
+    }
+
+    public function max($columnName) {
+        $this->selectQuery["function"] = ["type" => "max", "column" => $columnName];
+        return $this;
+    }
+
+    public function count($columnName = NULL) {
+        $this->selectQuery["function"] = ["type" => "count", "column" => ($columnName ? $columnName : "*")];
+        return $this;
+    }
+
+    public function sum($columnName) {
+        $this->selectQuery["function"] = ["type" => "sum", "column" => $columnName];
+        return $this;
+    }
+
+    public function avg($columnName) {
+        $this->selectQuery["function"] = ["type" => "avg", "column" => $columnName];
+        return $this;
+    }
+
+    public function join($type, $otherTable, $column1, $column2) { 
+        $this->selectQuery["join"] = [
+            "type" => $type,
+            "otherTable" => $otherTable,
+            "columnTable1" => $column1,
+            "columnTable2" => $column2
+        ];
+        return $this;
+    }
 
     public function innerJoin($type, $otherTable, $column1, $column2) {
         return $this->join($type, $otherTable, $column1, $column2);
