@@ -17,6 +17,10 @@ class ExampleController {
      * but for semantic reason its highly recommended
      */
     public function index() {
+        $user = new User;
+        print_r($user->or(["name", "pedro"])->get());
+
+
         // $user = new User;
         // $user->find(1);
         // print_r($user->getAttributes());

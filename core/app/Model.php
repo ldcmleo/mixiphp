@@ -201,68 +201,140 @@ class Model {
      * 
      */
     public function select($columns = NULL) {
-        if(!is_array($columns) && !is_string($columns)) return $this;
-        if(is_string($columns)) {
-            $columns = explode(" ", $columns);
+        if(!is_array($columns) && !is_string($columns) && !is_null($columns)) return $this;
+
+        if(is_null($columns)) $columns[] = "*";
+        else if(is_string($columns)) $columns = explode(" ", $columns);
+
+        $this->selectQuery["select"] = $columns;
+        return $this;
+    }
+
+    public function where(Array $conditions) {
+        $result = NULL;
+        if(!is_array($conditions[0])) {
+            $conditions = [
+                $conditions
+            ];
         }
 
-        $this->selectQuery["cols"] = $columns;
-        return $this;
-    }
+        foreach($conditions as $condition) {
+            $result[] = [
+                $condition[0], 
+                isset($condition[2]) ? $condition[1] : "=", 
+                isset($condition[2]) ? $condition[2] : $condition[1]
+            ];
+        }
 
-    public function where($conditions) {
         $this->selectQuery["where"] = [
-            "type" => "and",
-            "conditions" => $conditions
+            "type" => "AND",
+            "conditions" => $result
         ];
         return $this;
     }
 
-    public function orWhere($conditions) {
+    public function orWhere(Array $conditions) {
+        $result = NULL;
+        if(!is_array($conditions[0])) {
+            $conditions = [
+                $conditions
+            ];
+        }
+
+        foreach($conditions as $condition) {
+            $result[] = [
+                $condition[0], 
+                isset($condition[2]) ? $condition[1] : "=", 
+                isset($condition[2]) ? $condition[2] : $condition[1]
+            ];
+        }
+
         $this->selectQuery["where"] = [
-            "type" => "or",
-            "conditions" => $conditions
+            "type" => "OR",
+            "conditions" => $result
         ];
         return $this;
     }
 
-    public function order($columns) {
-        $this->selectQuery["order"] = $columns;
+    public function and(Array $condition) {
+        $result = [
+            $condition[0], 
+            isset($condition[2]) ? $condition[1] : "=", 
+            isset($condition[2]) ? $condition[2] : $condition[1]
+        ];
+        $this->selectQuery["and"][] = $result;
         return $this;
     }
 
-    public function and($conditions) {
-        $this->selectQuery["and"][] = $conditions;
+    public function or(Array $condition) {
+        $result = [
+            $condition[0], 
+            isset($condition[2]) ? $condition[1] : "=", 
+            isset($condition[2]) ? $condition[2] : $condition[1]
+        ];
+        $this->selectQuery["or"][] = $result;
         return $this;
     }
 
-    public function or($conditions) {
-        $this->selectQuery["or"][] = $conditions;
+    public function in(string $columnName, Array $values) { 
+        $this->selectQuery["in"][] = [
+            "type" => "AND",
+            "column" => $columnName, 
+            "values" => $values
+        ];
         return $this;
     }
 
-    public function not($conditions) {
-        $this->selectQuery["not"][] = $conditions;
+    public function orIn(string $columnName, Array $values) {
+        $this->selectQuery["in"][] = [
+            "type" => "OR",
+            "column" => $columnName,
+            "values" => $values
+        ];
+
         return $this;
     }
 
-    public function in($columnName, $values) { 
-        $this->selectQuery["in"] = ["column" => $columnName, "values", $values];
+    public function like($column, $wildcar) { 
+        $this->selectQuery["like"][] = [
+            "type" => "AND",
+            "column" => $column,
+            "value" => $wildcar
+        ];
         return $this;
     }
 
-    public function take($nrows) { 
+    public function orLike($column, $wildcar) { 
+        $this->selectQuery["like"][] = [
+            "type" => "OR",
+            "column" => $column,
+            "value" => $wildcar
+        ];
+        return $this;
+    }
+
+    public function take(int $nrows) { 
         $this->selectQuery["limit"] = $nrows;
         return $this;
     }
 
-    public function like($wildcar) { 
-        $this->selectQuery["like"] = $wildcar;
-        return $this;
-    }
+    public function order($columns) {
+        $result = [];
+        if(is_string($columns)) {
+            $result[] = [$columns, "ASC"];
+        } else if(is_array($columns) and !is_array($columns[0])) {
+            foreach($columns as $col) {
+                $result[] = [$col, "ASC"];
+            }
+        } else if(is_array($columns) and is_array($columns[0])) {
+            foreach($columns as $col) {
+                $result[] = [$col[0], (isset($col[1]) ? $col[1] : "ASC")];
+            }
+        } else {
+            return $this;
+        }
 
-    public function orLike($wildcar) { 
-        $this->selectQuery["orLike"] = $wildcar;
+        $this->selectQuery["order"] = $result;
         return $this;
     }
 
@@ -322,7 +394,142 @@ class Model {
      * retrieve the select query with the database results
      * 
      */
-    public function get() { }
+    public function get() { 
+        $tableName = $this->getTableName();
+        $select = "";
+        $where = "";
+        $join = "";
+        $order = "";
+        $limit = "";
+        $sql = "";
+        $binds = [];
+        $args = $this->selectQuery;
+
+        try {
+            if(isset($args["select"])) {
+                foreach($args["select"] as $column) {
+                    $select .= "$column, ";
+                }
+                $select = substr($select, 0 , -2);
+            }
+
+            if(isset($args["function"])) {
+                $func = strtoupper($args["function"]["type"]);
+                $column = $args["function"]["column"];
+                $select = "$func($column)";
+            }
+    
+            if(isset($args["where"])) {
+                $logicOperator = strtoupper($args["where"]["type"]);
+                $conditions = $args["where"]["conditions"];
+                foreach($conditions as $condition) {
+                    $column = $condition[0];
+                    $operator = $condition[1];
+                    $value = $condition[2];
+                    $whereID = count($binds);
+                    $where .= "$column $operator :w$column$whereID $logicOperator ";
+                    $binds[":w$column$whereID"] = $value; 
+                }
+    
+                $where = trim(substr($where, 0, -(strlen($logicOperator) + 1)));     
+            }
+
+            if(isset($args["and"])) {
+                foreach ($args["and"] as $condition) {
+                    $column = $condition[0];
+                    $operator = $condition[1];
+                    $value = $condition[2];
+                    $whereID = count($binds);
+                    if(!$where) {
+                        $where .= "$column $operator :w$column$whereID";
+                    } else {
+                        $where .= " AND $column $operator :w$column$whereID";
+                    }
+
+                    $binds[":w$column$whereID"] = $value;
+                }
+            }
+
+            if(isset($args["or"])) {
+                foreach ($args["or"] as $condition) {
+                    $column = $condition[0];
+                    $operator = $condition[1];
+                    $value = $condition[2];
+                    $whereID = count($binds);
+                    if(!$where) {
+                        $where .= "$column $operator :w$column$whereID";
+                    } else {
+                        $where .= " OR $column $operator :w$column$whereID";
+                    }
+
+                    $binds[":w$column$whereID"] = $value;
+                }
+            }
+
+            if(isset($args["in"])) {
+                foreach ($args["in"] as $in) {
+                    $logicOperator = strtoupper($in["type"]);
+                    $column = $in["column"];
+                    $values = "";
+                    foreach($in["values"] as $number => $value) {
+                        $values .= ":in$column$number, ";
+                        $binds[":in$column$number"] = $value;
+                    }
+
+                    $values = substr($values, 0, -2);
+
+                    if(!$where) {
+                        $where .= "$column IN ($values)";
+                    } else {
+                        $where .= " $logicOperator $column IN ($values)";
+                    }
+                }
+            }
+
+            if(isset($args["like"])) {
+                foreach($args["like"] as $number => $like) {
+                    $logicOperator = strtoupper($like["type"]);
+                    $column = $like["column"];
+                    $value = $like["value"];
+                    if(!$where) {
+                        $where .= "$column LIKE :like$column$number";
+                    } else {
+                        $where .= " $logicOperator $column LIKE :like$column$number";
+                    }
+
+                    $binds[":like$column$number"] = $value;
+                }
+            }
+
+            ## joins here
+            ## end joins
+
+            if(isset($args["order"])) {
+                $columns = $args["order"];
+                $order .= "ORDER BY ";
+                foreach($columns as $cols) {
+                    $order .= ":o" . $cols[0] . " " . strtoupper($cols[1]) . ", ";
+                    $binds[":o" . $cols[0]] = $cols[0];
+                }
+
+                $order = substr($order, 0, -2);
+            }
+
+            if(isset($args["limit"])) {
+                $limit = "LIMIT " . $args["limit"];
+            }
+    
+            $select = $select ? $select : "*";
+            $where = $where ? "WHERE $where" : "";
+
+            $sql = trim("SELECT $select FROM `$tableName` $join $where $order $limit");
+            print_r($binds);
+            echo "<br>";
+            return $sql;
+        } catch (\Throwable $th) {
+            throw new \Exception("Error with get method in Model " . $this->getTableName() . " <br> Error: " . $th->getMessage());
+        }
+    }
 
     public function executeQuery($sql, $args = NULL) {
         $db = new Database;
