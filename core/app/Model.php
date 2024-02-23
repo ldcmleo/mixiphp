@@ -200,14 +200,19 @@ class Model {
      * select
      * 
      */
-    public function select($columns = NULL) {
-        if(!is_array($columns) && !is_string($columns) && !is_null($columns)) return $this;
+    public static function select($columns = NULL) {
+        if(!is_array($columns) && !is_string($columns) && !is_null($columns)) {
+            $newModel = get_called_class();
+            $newModel = new $newModel;
+            return $newModel;
+        }
 
-        if(is_null($columns)) $columns[] = "*";
-        else if(is_string($columns)) $columns = explode(" ", $columns);
+        if(is_string($columns)) $columns = explode(" ", $columns);
 
-        $this->selectQuery["select"] = $columns;
-        return $this;
+        $newModel = get_called_class();
+        $newModel = new $newModel;
+        if($columns) $newModel->selectQuery["select"] = $columns;
+        return $newModel;
     }
 
     public function where(Array $conditions) {
@@ -262,7 +267,10 @@ class Model {
             isset($condition[2]) ? $condition[1] : "=", 
             isset($condition[2]) ? $condition[2] : $condition[1]
         ];
-        $this->selectQuery["and"][] = $result;
+        $this->selectQuery["extraWhere"][] = [
+            "type" => "AND",
+            "value" => $result
+        ];
         return $this;
     }
 
@@ -272,7 +280,10 @@ class Model {
             isset($condition[2]) ? $condition[1] : "=", 
             isset($condition[2]) ? $condition[2] : $condition[1]
         ];
-        $this->selectQuery["or"][] = $result;
+        $this->selectQuery["extraWhere"][] = [
+            "type" => "OR",
+            "value" => $result
+        ];
         return $this;
     }
 
@@ -373,20 +384,20 @@ class Model {
         return $this;
     }
 
-    public function innerJoin($type, $otherTable, $column1, $column2) {
-        return $this->join($type, $otherTable, $column1, $column2);
+    public function innerJoin($otherTable, $column1, $column2) {
+        return $this->join("INNER", $otherTable, $column1, $column2);
     }
 
-    public function leftJoin($type, $otherTable, $column1, $column2) {
-        return $this->join($type, $otherTable, $column1, $column2);
+    public function leftJoin($otherTable, $column1, $column2) {
+        return $this->join("LEFT", $otherTable, $column1, $column2);
     }
 
-    public function rightJoin($type, $otherTable, $column1, $column2) {
-        return $this->join($type, $otherTable, $column1, $column2);
+    public function rightJoin($otherTable, $column1, $column2) {
+        return $this->join("RIGHT", $otherTable, $column1, $column2);
     }
 
-    public function fullJoin($type, $otherTable, $column1, $column2) {
-        return $this->join($type, $otherTable, $column1, $column2);
+    public function fullJoin($otherTable, $column1, $column2) {
+        return $this->join("FULL OUTER", $otherTable, $column1, $column2);
     }
 
     /**
@@ -407,10 +418,7 @@ class Model {
 
         try {
             if(isset($args["select"])) {
-                foreach($args["select"] as $column) {
-                    $select .= "$column, ";
-                }
-                $select = substr($select, 0 , -2);
+                $select = implode(", ", $args["select"]);
             }
 
             if(isset($args["function"])) {
@@ -422,61 +430,30 @@ class Model {
             if(isset($args["where"])) {
                 $logicOperator = strtoupper($args["where"]["type"]);
                 $conditions = $args["where"]["conditions"];
+                $operations = [];
                 foreach($conditions as $condition) {
                     $column = $condition[0];
                     $operator = $condition[1];
                     $value = $condition[2];
                     $whereID = count($binds);
-                    $where .= "$column $operator :w$column$whereID $logicOperator ";
+                    $operations[] = "$column $operator :w$column$whereID";
                     $binds[":w$column$whereID"] = $value; 
                 }
     
-                $where = trim(substr($where, 0, -(strlen($logicOperator) + 1)));     
-            }
-
-            if(isset($args["and"])) {
-                foreach ($args["and"] as $condition) {
-                    $column = $condition[0];
-                    $operator = $condition[1];
-                    $value = $condition[2];
-                    $whereID = count($binds);
-                    if(!$where) {
-                        $where .= "$column $operator :w$column$whereID";
-                    } else {
-                        $where .= " AND $column $operator :w$column$whereID";
-                    }
-
-                    $binds[":w$column$whereID"] = $value;
-                }
-            }
-
-            if(isset($args["or"])) {
-                foreach ($args["or"] as $condition) {
-                    $column = $condition[0];
-                    $operator = $condition[1];
-                    $value = $condition[2];
-                    $whereID = count($binds);
-                    if(!$where) {
-                        $where .= "$column $operator :w$column$whereID";
-                    } else {
-                        $where .= " OR $column $operator :w$column$whereID";
-                    }
-
-                    $binds[":w$column$whereID"] = $value;
-                }
+                $where = implode(" $logicOperator ", $operations);
             }
 
             if(isset($args["in"])) {
                 foreach ($args["in"] as $in) {
                     $logicOperator = strtoupper($in["type"]);
                     $column = $in["column"];
-                    $values = "";
+                    $values = [];
                     foreach($in["values"] as $number => $value) {
-                        $values .= ":in$column$number, ";
+                        $values[] = ":in$column$number";
                         $binds[":in$column$number"] = $value;
                     }
 
-                    $values = substr($values, 0, -2);
+                    $values = implode(", ", $values);
 
                     if(!$where) {
                         $where .= "$column IN ($values)";
@@ -501,18 +478,53 @@ class Model {
                 }
             }
 
-            ## joins here
-            ## end joins
+            if(isset($args["extraWhere"])) {
+                foreach ($args["extraWhere"] as $condition) {
+                    $type = $condition["type"];
+                    $values = $condition["value"];
+                    $column = $values[0];
+                    $operator = $values[1];
+                    $value = $values[2];
+                    $whereID = count($binds);
+                    if(!$where) {
+                        $where .= "$column $operator :w$column$whereID";
+                    } else {
+                        $where .= " $type $column $operator :w$column$whereID";
+                    }
+
+                    $binds[":w$column$whereID"] = $value;
+                }
+            }
+
+            if(isset($args["join"])) {
+                $type = $args["join"]["type"];
+                $table2 = $args["join"]["otherTable"];
+                $column1 = $args["join"]["columnTable1"];
+                $column2 = $args["join"]["columnTable2"];
+                $selectCols = [];
+                if($select) {
+                    $allColumns = explode(", ", $select);
+                    foreach($allColumns as $column) {
+                        if($column1 == $column) continue;
+                        $selectCols[] = "$tableName.$column";
+                    }
+                }
+                $selectCols[] = "$tableName.$column1";
+                $selectCols[] = "$table2.$column2";
+
+                $select = implode(", ", $selectCols);
+                $join = "$type JOIN `$table2` ON $tableName.$column1 = $table2.$column2";
+            }
 
             if(isset($args["order"])) {
                 $columns = $args["order"];
-                $order .= "ORDER BY ";
+                $values = [];
                 foreach($columns as $cols) {
-                    $order .= ":o" . $cols[0] . " " . strtoupper($cols[1]) . ", ";
+                    $values[] = ":o" . $cols[0] . " " . strtoupper($cols[1]);
                     $binds[":o" . $cols[0]] = $cols[0];
                 }
 
-                $order = substr($order, 0, -2);
+                $order = implode(", ", $values);
             }
 
             if(isset($args["limit"])) {
@@ -521,11 +533,25 @@ class Model {
     
             $select = $select ? $select : "*";
             $where = $where ? "WHERE $where" : "";
+            $order = $order ? "ORDER BY $order" : "";
 
             $sql = trim("SELECT $select FROM `$tableName` $join $where $order $limit");
-            print_r($binds);
-            echo "<br>";
-            return $sql;
+            // print_r($sql);
+            $results = $this->executeQuery($sql, $binds);
+            if($results) {
+                if(count($results) > 1) {
+                    $resultArray = [];
+                    foreach($results as $result) {
+                        $newModel = get_called_class();
+                        $newModel = new $newModel((array) $result);
+                        $resultArray[] = $newModel;
+                    }
+                    return $resultArray;
+                }
+                $newModel = get_called_class();
+                $newModel = new $newModel((array) $results[0]);
+                return $newModel;
+            }
         } catch (\Throwable $th) {
             throw new \Exception("Error with get method in Model " . $this->getTableName() . " <br> Error: " . $th->getMessage());
         }
