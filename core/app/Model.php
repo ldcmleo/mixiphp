@@ -181,19 +181,22 @@ class Model {
      * find
      * search for a specific row in database model -> tablename
      * 
-     * @param mix $value identifier of the searched row
+     * @param mix $id identifier of the searched row
      */
-    public function find($value) {
-        $tableName = $this->getTableName();
-        $pk = $this->getPrimaryKey();
+    public static function find($id) {
+        $newModel = get_called_class();
+        $newModel = new $newModel;
+        $tableName = $newModel->getTableName();
+        $pk = $newModel->getPrimaryKey();
 
         $db = new Database;
         $db->query("SELECT * FROM $tableName WHERE $pk = :$pk");
-        $db->bind(":$pk", $value);
+        $db->bind(":$pk", $id);
         $result = $db->getRow();
 
         if(!$result) return NULL;
-        $this->setAttributes((array) $result);
+        $newModel->setAttributes((array) $result);
+        return $newModel;
     }
 
     /**
@@ -594,6 +597,13 @@ class Model {
     public function getAttribute($attribute) {
         if(!key_exists($attribute, $this->attributes)) return;
         return $this->attributes[$attribute];
+    }
+
+    public function removeAttribute($attribute) {
+        if(!$this->attrExists($attribute)) return;
+        $value = $this->attributes[$attribute];
+        unset($this->attributes[$attribute]);
+        return $value;
     }
 
     public function attrExists($attribute) {
