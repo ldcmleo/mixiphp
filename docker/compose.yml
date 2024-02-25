@@ -22,11 +22,11 @@ services:
     links:
       - db
     volumes:
-      - "/home/ldcmleo/Dev/mixiphp/public:/var/www/html"
-      - "/home/ldcmleo/Dev/mixiphp/core:/var/www/mixi/core"
-      - "/home/ldcmleo/Dev/mixiphp/app:/var/www/mixi/app"
-      - "/home/ldcmleo/Dev/mixiphp/config:/var/www/mixi/config"
-      - "/home/ldcmleo/Dev/mixiphp/routes:/var/www/mixi/routes"
+      - "/home/ldcmleo/public/mixiphp/public:/var/www/html"
+      - "/home/ldcmleo/public/mixiphp/core:/var/www/mixi/core"
+      - "/home/ldcmleo/public/mixiphp/app:/var/www/mixi/app"
+      - "/home/ldcmleo/public/mixiphp/config:/var/www/mixi/config"
+      - "/home/ldcmleo/public/mixiphp/routes:/var/www/mixi/routes"
     ports:
       - "80:80"
     networks:
