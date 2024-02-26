@@ -78,7 +78,7 @@ class Model {
     /**
      * remove
      * 
-     * delete this model from the database
+     * delete actual instance model from the database
      * 
      * @param string $whereColumn column where clause from delete statement
      * @return boolean true on success, false on fail
