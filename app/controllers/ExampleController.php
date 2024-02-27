@@ -17,8 +17,8 @@ class ExampleController {
      * but for semantic reason its highly recommended
      */
     public function index() {
-        $user = new User;
-        print_r($user->or(["name", "pedro"])->get());
+        // $user = new User;
+        // print_r($user->or(["name", "pedro"])->get());
 
 
         // $user = new User;
@@ -31,7 +31,7 @@ class ExampleController {
         // echo "<br>";
         // if($user->update()) echo "actualizao";
         
-        // return View::use("example");
+        return View::use("welcome");
     }
 
     /**

@@ -564,17 +564,7 @@ class Model {
         $db = new Database;
         $db->query($sql);
         if($args) {
-            foreach ($args as $key => $arg) {
-                $db->bind($key, $arg);
-            }
-        }
-
-        return $db->getRows();
-    }
-
-    ## build select query to be executed
-    private function build() { }
-
+            foreach ($args as $key => $arg 
     public function getPrimaryKey() {
         $db = new Database;
         return $db->getPrimaryKey($this->tableName);
