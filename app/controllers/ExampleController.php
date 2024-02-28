@@ -17,6 +17,17 @@ class ExampleController {
      * but for semantic reason its highly recommended
      */
     public function index() {
+        //$user = new User([
+        //    "name" => "pedro",
+        //    "email" => "pedro@mail.com"
+        //]);
+        //echo $user->name . "<br>";
+        //echo $user->email . "<br>";
+        //$user->pass = "abc123";
+        //print_r($user->getAttributes());
+        //echo "<br>" . $user->pass;
+        //$user->role = 1;
+        //$user->save();
         return View::use("welcome");
     }
 

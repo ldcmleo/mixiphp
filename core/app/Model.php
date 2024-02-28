@@ -8,10 +8,9 @@ use core\db\Query;
  * parent class for all models, with default functions to manage
  * all models with the database.
  */
-class Model {
-    private $tableName;
-    private $attributes;
-    private $selectQuery;
+class Model extends \StdClass {
+    protected $tableName;
+    protected $selectQuery;
     
     public function __construct($attributes = NULL) {
         $this->tableName = $this->setTableName();
@@ -533,33 +532,34 @@ class Model {
 
     public function setAttributes(array $attributes) {
         foreach($attributes as $column => $value) {
-            $this->setAttribute($column, $value);
+            $this->{$column} = $value;
         }
     }
     
     public function getAttributes() {
-        return $this->attributes;
+        $attributes = get_object_vars($this);
+        unset($attributes["tableName"]);
+        unset($attributes["selectQuery"]);
+        return $attributes;
     }
 
     public function setAttribute($attribute, $value) {
-        $this->attributes[$attribute] = $value;
+        $this->{$attribute} = $value;
     }
 
     public function getAttribute($attribute) {
-        if(!key_exists($attribute, $this->attributes)) return;
-        return $this->attributes[$attribute];
+        return isset($this->{$attribute}) ? $this->{$attribute} : "";
     }
 
     public function removeAttribute($attribute) {
         if(!$this->attrExists($attribute)) return;
-        $value = $this->attributes[$attribute];
-        unset($this->attributes[$attribute]);
+        $value = $this->{$attribute};
+        unset($this->{$attribute});
         return $value;
     }
 
     public function attrExists($attribute) {
-        if(!$this->getAttribute($attribute)) return false;
-        return true;
+        return isset($this->{$attribute});
     }
 
     /**
