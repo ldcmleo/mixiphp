@@ -14,6 +14,7 @@ include_once ROOT."core/util/enum.php";
 include_once ROOT."core/util/const.php";
 
 include_once ROOT."core/db/Database.php";
+include_once ROOT."core/db/Query.php";
 
 include_once ROOT."core/routing/Argument.php";
 include_once ROOT."core/routing/Request.php";

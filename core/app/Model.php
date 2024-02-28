@@ -1,6 +1,6 @@
 <?php
 namespace core\app;
-use core\db\Database;
+use core\db\Query;
 
 /**
  * class Model
@@ -19,29 +19,6 @@ class Model {
     }
 
     /**
-     * use
-     * 
-     * retrieve a model child class with @model as name (name of file too)
-     * u can also use traditional instance method e.j. $user = new User();
-     * 
-     * @param string $model name of file and class to be used
-     * @return object instance of model class
-     */
-    public static function use($model) {
-        if(!$model) {
-            throw new \Exception("Model::use expected 1 argument but it doesn't exist");
-        }
-
-        $model = ucfirst($model);
-        if(!file_exists(MODELS.$model.".php")) {
-            throw new \Exception("Model: $model, doesn't exist");
-        }
-
-        require_once MODELS.$model.".php";
-        return new $model();
-    }
-
-    /**
      * save
      * insert current model child class into respective table in db
      * 
@@ -53,26 +30,24 @@ class Model {
         }
         
         $columns = "";
+        $arrayColumns = array();
         $values = "";
+        $arrayValues = array();
+        $arrayBind = array();
 
         foreach($this->getAttributes() as $column => $value) {
-            $columns .= "$column, ";
-            $values .= ":$column, ";
+            $arrayColumns[] = $column;
+            $arrayValues[] = ":$column";
+            $arrayBind[":$column"] = $value;
         }
         
-        $columns = substr($columns, 0, -2);
-        $values = substr($values, 0, -2);
+        $columns = implode(", ", $arrayColumns);
+        $values = implode(", ", $arrayValues);
         $tableName = $this->getTableName();
 
         $sql = "INSERT INTO `$tableName` ($columns) VALUES ($values)";
 
-        $db = new Database;
-        $db->query($sql);
-        foreach($this->getAttributes() as $column => $value) {
-            $db->bind(":$column", $value);
-        }
-
-        return $db->exec();
+        return Query::execute($sql, $arrayBind);
     }
 
     /**
@@ -97,11 +72,9 @@ class Model {
             $tableName = $this->getTableName();
             $sql = "DELETE FROM `$tableName` WHERE $column = :$column";
             
-            $db = new Database;
-            $db->query($sql);
-            $db->bind(":$column", $this->getAttribute($column));
-
-            return $db->exec();
+            return Query::execute($sql, [
+                ":$column" => $this->getAttribute($column)
+            ]);
         }
 
         $pk = $this->getPrimaryKey();
@@ -111,11 +84,10 @@ class Model {
 
         $tableName = $this->getTableName();
         $sql = "DELETE FROM `$tableName` WHERE $pk = :$pk";
-        $db = new Database;
-        $db->query($sql);
-        $db->bind(":$pk", $this->getAttribute($pk));
 
-        return $db->exec();
+        return Query::execute($sql, [
+            ":$pk" => $this->getAttribute($pk)
+        ]);
     }
 
     /**
@@ -137,21 +109,19 @@ class Model {
             $whereColumn = strtolower($whereColumn);
 
             $sets = "";
+            $arraySets = array();
+            $arrayBind = array();
             foreach($this->getAttributes() as $column => $value) {
-                $sets .= "$column = :$column, ";
+                $arraySets[] = "$column = :$column";
+                $arrayBind[":$column"] = $value; 
             }
-            $sets = substr($sets, 0, -2);
+            $sets = implode(", ", $arraySets);
 
             $tableName = $this->getTableName();
             $sql = "UPDATE `$tableName` SET $sets WHERE $whereColumn = :w$whereColumn";
-            $db = new Database;
-            $db->query($sql);
-            foreach($this->getAttributes() as $column => $value) {
-                $db->bind(":$column", $value);
-            }
-            $db->bind(":w$whereColumn", $this->getAttribute($whereColumn));
+            $arrayBind[":w$whereColumn"] = $this->getAttribute($whereColumn);
 
-            return $db->exec();
+            return Query::execute($sql, $arrayBind);
         }
 
         $pk = $this->getPrimaryKey();
@@ -160,21 +130,19 @@ class Model {
         }
 
         $sets = "";
+        $arraySets = array();
+        $arrayBind = array();
         foreach($this->getAttributes() as $column => $value) {
-            $sets .= "$column = :$column, ";
+            $arraySets[] = "$column = :$column";
+            $arrayBind[":$column"] = $value;
         }
-        $sets = substr($sets, 0, -2);
+        $sets = implode(", ", $arraySets);
 
         $tableName = $this->getTableName();
         $sql = "UPDATE `$tableName` SET $sets WHERE $pk = :w$pk";
-        $db = new Database;
-        $db->query($sql);
-        foreach($this->getAttributes() as $column => $value) {
-            $db->bind(":$column", $value);
-        }
-        $db->bind(":w$pk", $this->getAttribute($pk));
+        $arrayBind[":w$pk"] = $this->getAttribute($pk);
 
-        return $db->exec();
+        return Query::execute($sql, $arrayBind);
     }
 
     /**
@@ -189,10 +157,9 @@ class Model {
         $tableName = $newModel->getTableName();
         $pk = $newModel->getPrimaryKey();
 
-        $db = new Database;
-        $db->query("SELECT * FROM $tableName WHERE $pk = :$pk");
-        $db->bind(":$pk", $id);
-        $result = $db->getRow();
+        $sql = "SELECT * FROM $tableName WHERE $pk = :$pk";
+
+        $result = Query::get($sql, [":$pk" => $id]);
 
         if(!$result) return NULL;
         $newModel->setAttributes((array) $result);
@@ -540,7 +507,7 @@ class Model {
 
             $sql = trim("SELECT $select FROM `$tableName` $join $where $order $limit");
             // print_r($sql);
-            $results = $this->executeQuery($sql, $binds);
+            $results = Query::getRows($sql, $binds);
             if($results) {
                 if(count($results) > 1) {
                     $resultArray = [];
@@ -560,21 +527,8 @@ class Model {
         }
     }
 
-    public function executeQuery($sql, $args = NULL) {
-        $db = new Database;
-        $db->query($sql);
-        if($args) {
-            foreach ($args as $key => $arg) {
-                $db->bind($key, $arg);
-            }
-        }
-
-        return $db->getRows();
-    }
-
     public function getPrimaryKey() {
-        $db = new Database;
-        return $db->getPrimaryKey($this->tableName);
+        return Query::getPrimaryKey($this->getTableName());
     }
 
     public function setAttributes(array $attributes) {
@@ -626,12 +580,11 @@ class Model {
     public function setTableName() {
         $modelName = (new \ReflectionClass($this))->getShortName();
         $modelNameAsArray = preg_split('/\B(?=[A-Z])/s', $modelName);
-        $tableName = "";
-        foreach ($modelNameAsArray as $word) {
-            $tableName .= strtolower($word) . "_";
+        foreach($modelNameAsArray as $key => $word) {
+            $modelNameAsArray[$key] = strtolower($word);
         }
 
-        return substr($tableName, 0 , -1);
+        return implode("_", $modelNameAsArray);
     }
 
     /**

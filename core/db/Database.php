@@ -118,18 +118,4 @@ class Database {
         $this->exec();
         return $this->stmt->fetch(\PDO::FETCH_OBJ);
     }
-
-    /**
-     * 
-     * getPrimaryKey
-     * obtain the primary key from specific table
-     * 
-     * @param string $tableName name of the table to find pk
-     * @return string name of the primary key
-     */
-    public function getPrimaryKey($tableName) {
-        $this->query("SHOW KEYS FROM $tableName WHERE Key_name = 'PRIMARY'");
-
-        return $this->getRow()->Column_name;
-    }
 }
