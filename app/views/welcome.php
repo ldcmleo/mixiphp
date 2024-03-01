@@ -6,7 +6,8 @@
     <title>Welcome to MixiPHP</title>
 </head>
 <body>
-    <h1>Welcome to MixiPHP</h1>
+    <h1>Welcome to MixiPHP!</h1>
     <p>A basic lightwheight php framework with MVC architecture.</p>
+    <p>You have MixiPHP installed sucessfully!</p>
 </body>
 </html>

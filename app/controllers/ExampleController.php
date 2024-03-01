@@ -15,9 +15,7 @@ class ExampleController {
      * Name default Controller entry as index is no needed,
      * but for semantic reason its highly recommended
      */
-    public function index() {
-        return View::use("welcome");
-    }
+    public function index() { return View::use("welcome"); }
 
     /**
      * varFromGet
@@ -26,16 +24,12 @@ class ExampleController {
      * * Entry parameter for function in controllers use the same name as defined
      * * in route file
      */
-    public function varFromGet($myvar) {
-        echo $myvar;
-    }
+    public function varFromGet($myvar) { echo $myvar; }
 
     /**
      * varFromPost
      * 
      * Post variables can be obtained with magic variable $_POST
      */
-    public function varFromPost() {
-        echo $_POST["myvar"];
-    }
+    public function varFromPost() { echo $_POST["myvar"]; }
 }
