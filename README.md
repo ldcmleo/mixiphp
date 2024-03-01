@@ -6,11 +6,12 @@ MixiPHP it's strongly inspired by [Laravel](https://laravel.com/) and therefore 
 
 ### Dependencies
 MixiPHP works with the next dependencies:
-| Docker Image                                                        | Version |
-|---------------------------------------------------------------------|---------|
-| mariadb                                                             | latest  |
+| Docker Image | Version |
+|--------------|---------|
+| mariadb      | latest  |
 | [ldcmleo1360/mixiphp](https://hub.docker.com/r/ldcmleo1360/mixiphp) | latest  |
-| phpmyadmin                                                          | latest  |
+| phpmyadmin   | latest  |
+
 MixiPHP use common mariadb and phpmyadmin for database, but use a custom httpd image and it can be found on [docker hub](https://hub.docker.com/r/ldcmleo1360/mixiphp).
 
 ## Installation
