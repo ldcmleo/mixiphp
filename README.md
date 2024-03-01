@@ -1,11 +1,17 @@
-# MixiPHP
+<div align="center">
+    <img src="https://i.postimg.cc/2S3FcvdY/mixiphp-readme.png" />
+    <div>
+        <img src="https://img.shields.io/badge/1.0.0-Main-blue" />
+        <img src="https://img.shields.io/badge/gitlab-version-red?logo=gitlab&link=https%3A%2F%2Fgitlab.com%2Fldcmleo%2Fmixiphp" />
+    </div>
+</div>
+<p align="center">
+    A lightweight php framework with MVC Architecture. <br>
+    MixiPHP is created for using with lightweight projects or even with school projects and is not intended to be used on a large scale projects. <br>
+    MixiPHP it's strongly inspired by <a href="https://laravel.com/" target="_blanket">Laravel</a> and therefore it can be a good starting point to learn how to use it, otherwise it will be easy for you to use.
+</p>
 
-![Static Badge](https://img.shields.io/badge/1.0.0-Main-blue)
-![Static Badge](https://img.shields.io/badge/gitlab-version-red?logo=gitlab&link=https%3A%2F%2Fgitlab.com%2Fldcmleo%2Fmixiphp)
-
-A lightweight php framework with MVC Architecture. <br>
-MixiPHP is created for using with lightweight projects or even with school projects and is not intended to be used on a large scale projects. <br>
-MixiPHP it's strongly inspired by [Laravel](https://laravel.com/) and therefore it can be a good starting point to learn how to use it, otherwise it will be easy for you to use.
+----
 
 ### Dependencies
 MixiPHP works with the next dependencies:
