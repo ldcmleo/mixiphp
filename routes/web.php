@@ -12,7 +12,7 @@ use core\app\View;
  * Static Class Router read this document in order,
  * first defined routes has prority to be readed
  */
-Router::get("/", "ExampleController@index");
+Router::get("/", "ExampleController@index")->name("main");
 
 /**
  * 
@@ -34,4 +34,4 @@ Router::get("/example", function () {
  * Very useful to pass variables from url to the controller or function.
  * So basically dynamic arguments are GET variables 
  */
-Router::get("/@myvar", "ExampleController@varFromGet");
+Router::get("/@myvar", "ExampleController@varFromGet")->name("varExample");

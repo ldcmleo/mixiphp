@@ -1,6 +1,7 @@
 <?php
 namespace core\routing;
 use core\app\View;
+use core\util\ArgumentType;
 /**
  * Class Router
  * By Leonardo Castro
@@ -12,6 +13,31 @@ use core\app\View;
 class Router {
     private static $request;
     private static $routes = [];
+
+    public static function go(string $responseName, array $arguments = NULL) {
+        $resArray = [];
+
+        foreach(self::$routes as $response) {
+            if($response->getName() != $responseName) continue;
+            if($response->getUrl()->size() == 0) return "/";
+
+            $resArgs = $response->getUrl()->getArgs();
+            $count = 0;
+            foreach($resArgs as $resArg) {
+                if($resArg->getType() == ArgumentType::Dynamic) {
+                    if(!isset($arguments[$count])) return "/";
+
+                    $resArray[] = $arguments[$count];
+                    $count++;
+                } else {
+                    $resArray[] = $resArg->getKey();
+                    $count++;
+                }
+            }
+        }
+
+        return count($resArray) ? implode("/", $resArray) : "/";
+    }
 
     public static function setRequest(Request $request) {
         Router::$request = $request;
@@ -26,11 +52,15 @@ class Router {
     }
 
     public static function get($url, $response) {
-        Router::$routes[] = new Response($url, "GET", $response);
+        $response = new Response($url, "GET", $response);
+        Router::$routes[] = $response;
+        return $response;
     }
 
     public static function post($url, $response) {
-        Router::$routes[] = new Response($url, "POST", $response);
+        $response = new Response($url, "POST", $response);
+        Router::$routes[] = $response;
+        return $response;
     }
 
     public static function execute() {

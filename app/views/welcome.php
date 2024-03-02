@@ -1,3 +1,4 @@
+<?php use core\routing\Router; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,5 +10,6 @@
     <h1>Welcome to MixiPHP!</h1>
     <p>A basic lightwheight php framework with MVC architecture.</p>
     <p>You have MixiPHP installed sucessfully!</p>
+    <a href="<?= Router::go("varExample", ["MixiPHP"]) ?>">Example of Router::GO</a>
 </body>
 </html>

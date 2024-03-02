@@ -13,6 +13,7 @@ class Response {
     private $url;
     private $method;
     private $function;
+    private $name;
 
     public function __construct($url, $method, $function) {
         if(!$method || !$function) {
@@ -59,4 +60,6 @@ class Response {
     public function setUrl($url) { $this->url = $url; }
     public function getMethod() { return $this->method; }
     public function setMethod($method) { $this->method = $method; }
+    public function getName() { return $this->name; }
+    public function name($name) { $this->name = $name; }
 }
