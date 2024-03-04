@@ -1,6 +1,7 @@
 <?php
 use core\routing\Router;
 use core\routing\Request;
+use core\app\Session;
 /**
  * Front Controller on public folder
  * 
@@ -9,6 +10,7 @@ use core\routing\Request;
  * MixiPHP app with static class Router
  */
 include_once "../mixi/core/run.php";
+Session::start();
 Router::setRequest(new Request((isset($_GET["url"]) ? $_GET["url"] : "/"), $_SERVER["REQUEST_METHOD"]));
 Router::setRoutes($_SERVER["HTTP_USER_AGENT"]);
 Router::execute();

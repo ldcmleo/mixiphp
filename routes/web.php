@@ -1,4 +1,6 @@
 <?php
+
+use core\app\Session;
 use core\routing\Router;
 use core\app\View;
 
@@ -26,6 +28,32 @@ Router::get("/example", function () {
 
     //* Everything from controllers can be used here like: View::use function
     return View::use("welcome");
+});
+
+/**
+ * Examples using logint auth and notAuth methods of responses
+ */
+Router::get("/login", function () {
+    echo "estas en el login";
+})->name("login")->auth("dashboard");
+
+Router::get("/dashboard", function () {
+    echo "estas en el dashboard";
+})->name("dashboard")->notAuth("login");
+
+Router::get("/session", function() {
+    echo "creando nueva session";
+    Session::createAuth([
+        "name" => "Leonardo"
+    ]);
+    echo "<br> se ha creado tu session ve a:<br>";
+    echo "<a href=\"" . Router::go("login") . "\">Login</a><br>";
+    echo "<a href=\"" . Router::go("dashboard") . "\">Dashboard</a><br>";
+});
+
+Router::get("/logout", function() {
+    Session::destroy();
+    Router::redirect("logout");
 });
 
 /**

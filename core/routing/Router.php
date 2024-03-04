@@ -1,7 +1,9 @@
 <?php
 namespace core\routing;
 use core\app\View;
+use core\app\Session;
 use core\util\ArgumentType;
+use core\util\AuthRedirectType;
 /**
  * Class Router
  * By Leonardo Castro
@@ -13,6 +15,17 @@ use core\util\ArgumentType;
 class Router {
     private static $request;
     private static $routes = [];
+
+    public static function redirect(string $to, array $arguments = NULL) {
+        if(str_contains($to, "/")) {
+            header("Location: $to");
+            die();
+        } else {
+            $url = self::go($to, $arguments);
+            header("Location: $url");
+            die();
+        }
+    }
 
     public static function go(string $responseName, array $arguments = NULL) {
         $resArray = [];
@@ -36,7 +49,7 @@ class Router {
             }
         }
 
-        return count($resArray) ? implode("/", $resArray) : "/";
+        return count($resArray) ? "/" . implode("/", $resArray) : "/";
     }
 
     public static function setRequest(Request $request) {
@@ -52,15 +65,15 @@ class Router {
     }
 
     public static function get($url, $response) {
-        $response = new Response($url, "GET", $response);
-        Router::$routes[] = $response;
-        return $response;
+        $route = new Response($url, "GET", $response);
+        Router::$routes[] = $route;
+        return $route;
     }
 
     public static function post($url, $response) {
-        $response = new Response($url, "POST", $response);
-        Router::$routes[] = $response;
-        return $response;
+        $route = new Response($url, "POST", $response);
+        Router::$routes[] = $route;
+        return $route;
     }
 
     public static function execute() {
@@ -78,6 +91,18 @@ class Router {
     public static function getResponse() {
         foreach (Router::$routes as $route) {
             if($route->getUrl()->equals(Router::$request->getUrl())) {
+                if($route->isAuthResponse()) {
+                    $authRedirectArgs = $route->getAuthRedirect();
+                    $type = $authRedirectArgs["type"];
+                    $redirectUrl = $authRedirectArgs["route"] ? $authRedirectArgs["route"] : "/";
+                    $args = $authRedirectArgs["arguments"];
+
+                    if($type == AuthRedirectType::Auth) {
+                        if(Session::isAuth()) return self::redirect($redirectUrl, $args);
+                    } else {
+                        if(!Session::isAuth()) return self::redirect($redirectUrl, $args);
+                    }
+                }
                 return $route;
             }
         }

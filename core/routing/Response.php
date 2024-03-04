@@ -1,6 +1,7 @@
 <?php
 namespace core\routing;
 use core\app\Controller;
+use core\util\AuthRedirectType;
 
 /**
  * Class Response
@@ -14,6 +15,8 @@ class Response {
     private $method;
     private $function;
     private $name;
+
+    private $authRedirect;
 
     public function __construct($url, $method, $function) {
         if(!$method || !$function) {
@@ -57,6 +60,21 @@ class Response {
         $this->setName($name);
         return $this;
     }
+
+    public function auth(string $goto = NULL, array $arguments = NULL) {
+        $this->setAuthRedirect(AuthRedirectType::Auth, $goto, $arguments);
+        return $this;
+    }
+
+    public function notAuth(string $goto = NULL, array $arguments = NULL) {
+        $this->setAuthRedirect(AuthRedirectType::NoAuth, $goto, $arguments);
+        return $this;
+    }
+
+    public function isAuthResponse() {
+        return isset($this->authRedirect);
+    }
+
     /**
      * Getters and Setter
      */
@@ -66,4 +84,12 @@ class Response {
     public function setMethod($method) { $this->method = $method; }
     public function getName() { return $this->name; }
     public function setName($name) { $this->name = $name; }
+    public function getAuthRedirect() { return $this->authRedirect; }
+    public function setAuthRedirect($type, $route = NULL, $arguments = NULL) {
+        $this->authRedirect = [
+            "type" => $type,
+            "route" => isset($route) ? $route : NULL,
+            "arguments" => isset($arguments) ? $arguments : NULL
+        ];
+    }
 }

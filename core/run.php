@@ -25,6 +25,7 @@ include_once ROOT."core/routing/Url.php";
 include_once ROOT."core/app/Controller.php";
 include_once ROOT."core/app/Model.php";
 include_once ROOT."core/app/View.php";
+include_once ROOT."core/app/Session.php";
 
 // including variable files in /app/models folder
 foreach (glob(ROOT."app/models/*.php") as $file) {
