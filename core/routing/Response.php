@@ -53,6 +53,10 @@ class Response {
         }
     }
 
+    public function name($name) {
+        $this->setName($name);
+        return $this;
+    }
     /**
      * Getters and Setter
      */
@@ -61,5 +65,5 @@ class Response {
     public function getMethod() { return $this->method; }
     public function setMethod($method) { $this->method = $method; }
     public function getName() { return $this->name; }
-    public function name($name) { $this->name = $name; }
+    public function setName($name) { $this->name = $name; }
 }
