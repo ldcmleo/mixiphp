@@ -21,7 +21,7 @@ MixiPHP works with the next dependencies:
 | [ldcmleo1360/mixiphp](https://hub.docker.com/r/ldcmleo1360/mixiphp) | latest  |
 | phpmyadmin   | latest  |
 
-MixiPHP use common mariadb and phpmyadmin for database, but use a custom httpd image and it can be found on [docker hub](https://hub.docker.com/r/ldcmleo1360/mixiphp).
+MixiPHP use common mariadb and phpmyadmin for database, but use a custom httpd image using php v8.3.2 and it can be found on [docker hub](https://hub.docker.com/r/ldcmleo1360/mixiphp).
 
 ## Installation
 
