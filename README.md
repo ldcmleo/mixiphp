@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://i.postimg.cc/2S3FcvdY/mixiphp-readme.png" />
+    <img src="https://raw.githubusercontent.com/ldcmleo/ldcmleo.github.io/main/assets/media/images/mixilogo2.png" />
     <div>
         <img src="https://img.shields.io/badge/1.0.0-Main-blue" />
         <img src="https://img.shields.io/badge/gitlab-version-red?logo=gitlab&link=https%3A%2F%2Fgitlab.com%2Fldcmleo%2Fmixiphp" />
