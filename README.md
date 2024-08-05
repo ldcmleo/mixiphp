@@ -1,10 +1,12 @@
 <div align="center">
-    <img src="https://raw.githubusercontent.com/ldcmleo/ldcmleo.github.io/main/assets/media/images/mixilogo2.png" />
     <div>
         <img src="https://img.shields.io/badge/1.0.0-Main-blue" />
         <img src="https://img.shields.io/badge/gitlab-version-red?logo=gitlab&link=https%3A%2F%2Fgitlab.com%2Fldcmleo%2Fmixiphp" />
     </div>
 </div>
+<p align="center">
+    ALERT!!!!!!!!!! <br> THIS PROJECT IS ACTUAL DEPRECATED AND WON'T BE MAINTAINED ANYMORE BY ME.
+</p>
 <p align="center">
     A lightweight php framework with MVC Architecture. <br>
     MixiPHP is created for using with lightweight projects or even with school projects and is not intended to be used on a large scale projects. <br>
